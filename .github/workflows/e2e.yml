@@ -1,0 +1,72 @@
+
+
+
+# -------------************* in this job i used ai to help me write the workflow *******-------------
+
+# based on my understanding  this workflow is used to run the e2e tests on every push and every pull request
+# checkout code
+# setup node.js
+# install packages
+# install playwright browser
+# run test
+# create allure report
+# upload allure report
+# publish to github pages 
+
+name: E2E tests
+
+on:
+  push:
+    branches-ignore:
+      - gh-pages
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 'E2E GUI Challenge'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: 'E2E GUI Challenge/package-lock.json'
+
+      - name: Install packages
+        run: npm ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run test
+        run: npx playwright test
+
+      - name: Create Allure report
+        if: always()
+        run: npx allure generate ./allure-results -o ./allure-report
+
+      - name: Upload Allure report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: 'E2E GUI Challenge/allure-report'
+          if-no-files-found: ignore
+
+      - name: Publish Allure report to GitHub Pages
+        if: always() && github.event_name == 'push'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: 'E2E GUI Challenge/allure-report'

@@ -1,0 +1,17 @@
+{
+  "name": "telenor-e2e-gui-challenge",
+  "version": "1.0.0",
+  "description": "Playwright E2E test for telenor.se",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "allure:generate": "allure generate ./allure-results -o ./allure-report",
+    "allure:open": "allure open ./allure-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.0",
+    "allure": "^3.20.1",
+    "allure-playwright": "^3.13.0"
+  }
+}
